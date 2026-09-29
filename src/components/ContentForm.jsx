@@ -1,16 +1,22 @@
 import { useState } from "react";
-import { STATUSES } from "../lib/constants.js";
+import { STATUS_KEYS } from "../lib/constants.js";
+import { useLanguage } from "../lib/LanguageContext.jsx";
 
-const EMPTY_FORM = {
-  title: "",
-  platform: "",
-  owner: "",
-  publishDate: "",
-  status: STATUSES[0],
-};
+function emptyForm(defaultStatus) {
+  return {
+    title: "",
+    platform: "",
+    owner: "",
+    publishDate: "",
+    status: defaultStatus,
+  };
+}
 
 export default function ContentForm({ initialItem, onSave, onCancel }) {
-  const [form, setForm] = useState(initialItem ? { ...initialItem } : EMPTY_FORM);
+  const { t } = useLanguage();
+  const [form, setForm] = useState(
+    initialItem ? { ...initialItem } : emptyForm(STATUS_KEYS[0])
+  );
   const [error, setError] = useState("");
 
   function handleChange(field, value) {
@@ -20,11 +26,11 @@ export default function ContentForm({ initialItem, onSave, onCancel }) {
   function handleSubmit(e) {
     e.preventDefault();
     if (!form.title.trim()) {
-      setError("Bitte einen Titel eingeben.");
+      setError(t.errorTitleRequired);
       return;
     }
     if (!form.publishDate) {
-      setError("Bitte ein Veröffentlichungsdatum wählen.");
+      setError(t.errorDateRequired);
       return;
     }
     setError("");
@@ -34,38 +40,38 @@ export default function ContentForm({ initialItem, onSave, onCancel }) {
   return (
     <div className="modal-overlay" onClick={onCancel}>
       <div className="modal" onClick={(e) => e.stopPropagation()}>
-        <h2>{initialItem ? "Content bearbeiten" : "Content hinzufügen"}</h2>
+        <h2>{initialItem ? t.formTitleEdit : t.formTitleAdd}</h2>
         <form onSubmit={handleSubmit}>
           <label>
-            Titel
+            {t.fieldTitle}
             <input
               type="text"
               value={form.title}
               onChange={(e) => handleChange("title", e.target.value)}
-              placeholder="z. B. Instagram-Reel Hundeernährung"
+              placeholder={t.fieldTitlePlaceholder}
               autoFocus
             />
           </label>
           <label>
-            Plattform
+            {t.fieldPlatform}
             <input
               type="text"
               value={form.platform}
               onChange={(e) => handleChange("platform", e.target.value)}
-              placeholder="z. B. Instagram, Newsletter, Blog"
+              placeholder={t.fieldPlatformPlaceholder}
             />
           </label>
           <label>
-            Verantwortlich
+            {t.fieldOwner}
             <input
               type="text"
               value={form.owner}
               onChange={(e) => handleChange("owner", e.target.value)}
-              placeholder="z. B. Anna"
+              placeholder={t.fieldOwnerPlaceholder}
             />
           </label>
           <label>
-            Veröffentlichungsdatum
+            {t.fieldPublishDate}
             <input
               type="date"
               value={form.publishDate}
@@ -73,14 +79,14 @@ export default function ContentForm({ initialItem, onSave, onCancel }) {
             />
           </label>
           <label>
-            Status
+            {t.fieldStatus}
             <select
               value={form.status}
               onChange={(e) => handleChange("status", e.target.value)}
             >
-              {STATUSES.map((status) => (
+              {STATUS_KEYS.map((status) => (
                 <option key={status} value={status}>
-                  {status}
+                  {t.statusLabels[status]}
                 </option>
               ))}
             </select>
@@ -88,10 +94,10 @@ export default function ContentForm({ initialItem, onSave, onCancel }) {
           {error && <p className="form-error">{error}</p>}
           <div className="modal-actions">
             <button type="button" className="btn-secondary" onClick={onCancel}>
-              Abbrechen
+              {t.cancel}
             </button>
             <button type="submit" className="btn-primary">
-              Speichern
+              {t.save}
             </button>
           </div>
         </form>

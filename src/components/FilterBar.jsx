@@ -1,4 +1,7 @@
+import { useLanguage } from "../lib/LanguageContext.jsx";
+
 export default function FilterBar({ items, filters, onChange }) {
+  const { t } = useLanguage();
   const platforms = uniqueValues(items, "platform");
   const owners = uniqueValues(items, "owner");
   const statuses = uniqueValues(items, "status");
@@ -6,12 +9,12 @@ export default function FilterBar({ items, filters, onChange }) {
   return (
     <div className="filter-bar">
       <label>
-        Plattform
+        {t.filterPlatform}
         <select
           value={filters.platform}
           onChange={(e) => onChange({ ...filters, platform: e.target.value })}
         >
-          <option value="">Alle</option>
+          <option value="">{t.filterAll}</option>
           {platforms.map((value) => (
             <option key={value} value={value}>
               {value}
@@ -20,12 +23,12 @@ export default function FilterBar({ items, filters, onChange }) {
         </select>
       </label>
       <label>
-        Verantwortlich
+        {t.filterOwner}
         <select
           value={filters.owner}
           onChange={(e) => onChange({ ...filters, owner: e.target.value })}
         >
-          <option value="">Alle</option>
+          <option value="">{t.filterAll}</option>
           {owners.map((value) => (
             <option key={value} value={value}>
               {value}
@@ -34,15 +37,15 @@ export default function FilterBar({ items, filters, onChange }) {
         </select>
       </label>
       <label>
-        Status
+        {t.filterStatus}
         <select
           value={filters.status}
           onChange={(e) => onChange({ ...filters, status: e.target.value })}
         >
-          <option value="">Alle</option>
+          <option value="">{t.filterAll}</option>
           {statuses.map((value) => (
             <option key={value} value={value}>
-              {value}
+              {t.statusLabels[value] || value}
             </option>
           ))}
         </select>
@@ -53,7 +56,7 @@ export default function FilterBar({ items, filters, onChange }) {
           className="btn-link"
           onClick={() => onChange({ platform: "", owner: "", status: "" })}
         >
-          Filter zurücksetzen
+          {t.filterReset}
         </button>
       )}
     </div>

@@ -1,8 +1,8 @@
-export const STATUSES = ["Entwurf", "Review", "Geplant", "Veröffentlicht"];
+export const STATUS_KEYS = ["draft", "review", "scheduled", "published"];
 
 export const STATUS_COLORS = {
-  Entwurf: "#9ca3af",
-  Review: "#f59e0b",
-  Geplant: "#3b82f6",
-  Veröffentlicht: "#22c55e",
+  draft: "#9ca3af",
+  review: "#f59e0b",
+  scheduled: "#3b82f6",
+  published: "#22c55e",
 };

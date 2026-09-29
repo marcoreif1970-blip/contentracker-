@@ -1,9 +1,11 @@
 import StatusBadge from "./StatusBadge.jsx";
-import { STATUSES } from "../lib/constants.js";
+import { STATUS_KEYS } from "../lib/constants.js";
+import { useLanguage } from "../lib/LanguageContext.jsx";
 
 const UPCOMING_WINDOW_DAYS = 14;
 
 export default function Dashboard({ items, onEdit }) {
+  const { t } = useLanguage();
   const today = new Date();
   today.setHours(0, 0, 0, 0);
   const windowEnd = new Date(today);
@@ -11,14 +13,14 @@ export default function Dashboard({ items, onEdit }) {
 
   const upcoming = items
     .filter((item) => {
-      if (item.status === "Veröffentlicht") return false;
+      if (item.status === "published") return false;
       if (!item.publishDate) return false;
       const date = new Date(item.publishDate + "T00:00:00");
       return date >= today && date <= windowEnd;
     })
     .sort((a, b) => a.publishDate.localeCompare(b.publishDate));
 
-  const counts = STATUSES.reduce((acc, status) => {
+  const counts = STATUS_KEYS.reduce((acc, status) => {
     acc[status] = items.filter((item) => item.status === status).length;
     return acc;
   }, {});
@@ -26,7 +28,7 @@ export default function Dashboard({ items, onEdit }) {
   return (
     <div>
       <div className="status-summary">
-        {STATUSES.map((status) => (
+        {STATUS_KEYS.map((status) => (
           <div key={status} className="status-tile">
             <StatusBadge status={status} />
             <span className="status-count">{counts[status]}</span>
@@ -34,14 +36,14 @@ export default function Dashboard({ items, onEdit }) {
         ))}
       </div>
 
-      <h2>Anstehend (nächste {UPCOMING_WINDOW_DAYS} Tage)</h2>
+      <h2>{t.upcomingHeading(UPCOMING_WINDOW_DAYS)}</h2>
       {upcoming.length === 0 ? (
-        <p className="empty-state">Nichts geplant in den nächsten {UPCOMING_WINDOW_DAYS} Tagen.</p>
+        <p className="empty-state">{t.upcomingEmpty(UPCOMING_WINDOW_DAYS)}</p>
       ) : (
         <ul className="upcoming-list">
           {upcoming.map((item) => (
             <li key={item.id} className="upcoming-item" onClick={() => onEdit(item)}>
-              <div className="upcoming-date">{formatDate(item.publishDate)}</div>
+              <div className="upcoming-date">{formatDate(item.publishDate, t.dateLocale)}</div>
               <div className="upcoming-details">
                 <span className="upcoming-title">{item.title}</span>
                 <span className="upcoming-meta">
@@ -57,9 +59,9 @@ export default function Dashboard({ items, onEdit }) {
   );
 }
 
-function formatDate(dateStr) {
+function formatDate(dateStr, locale) {
   const date = new Date(dateStr + "T00:00:00");
-  return date.toLocaleDateString("de-DE", {
+  return date.toLocaleDateString(locale, {
     weekday: "short",
     day: "2-digit",
     month: "2-digit",

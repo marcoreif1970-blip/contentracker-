@@ -1,17 +1,25 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useContentItems } from "./hooks/useContentItems.js";
+import { LanguageProvider, useLanguage } from "./lib/LanguageContext.jsx";
+import { LANGUAGES } from "./lib/i18n.js";
+import { translations } from "./lib/i18n.js";
 import Dashboard from "./components/Dashboard.jsx";
 import ContentList from "./components/ContentList.jsx";
 import ContentForm from "./components/ContentForm.jsx";
 
 const EMPTY_FILTERS = { platform: "", owner: "", status: "" };
 
-export default function App() {
+function AppContent() {
+  const { t, lang, setLang } = useLanguage();
   const { items, addItem, updateItem, deleteItem } = useContentItems();
   const [view, setView] = useState("dashboard");
   const [filters, setFilters] = useState(EMPTY_FILTERS);
   const [editingItem, setEditingItem] = useState(null);
   const [showForm, setShowForm] = useState(false);
+
+  useEffect(() => {
+    document.title = t.appTitle;
+  }, [t.appTitle]);
 
   const filteredItems = items.filter((item) => {
     if (filters.platform && item.platform !== filters.platform) return false;
@@ -44,23 +52,34 @@ export default function App() {
   return (
     <div className="app">
       <header className="app-header">
-        <h1>Content-Tracker</h1>
+        <h1>{t.appTitle}</h1>
         <nav className="tabs">
           <button
             className={view === "dashboard" ? "tab active" : "tab"}
             onClick={() => setView("dashboard")}
           >
-            Dashboard
+            {t.navDashboard}
           </button>
           <button
             className={view === "list" ? "tab active" : "tab"}
             onClick={() => setView("list")}
           >
-            Alle Inhalte
+            {t.navList}
           </button>
         </nav>
+        <div className="lang-switch">
+          {LANGUAGES.map((code) => (
+            <button
+              key={code}
+              className={lang === code ? "lang-btn active" : "lang-btn"}
+              onClick={() => setLang(code)}
+            >
+              {translations[code].langLabel}
+            </button>
+          ))}
+        </div>
         <button className="btn-primary" onClick={openAddForm}>
-          + Content hinzufügen
+          {t.addButton}
         </button>
       </header>
 
@@ -90,5 +109,13 @@ export default function App() {
         />
       )}
     </div>
+  );
+}
+
+export default function App() {
+  return (
+    <LanguageProvider>
+      <AppContent />
+    </LanguageProvider>
   );
 }

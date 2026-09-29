@@ -1,8 +1,20 @@
 import { useEffect, useState } from "react";
 import { loadItems, saveItems } from "../lib/storage.js";
 
+const LEGACY_STATUS_MAP = {
+  Entwurf: "draft",
+  Review: "review",
+  Geplant: "scheduled",
+  Veröffentlicht: "published",
+};
+
+function migrateItem(item) {
+  const mapped = LEGACY_STATUS_MAP[item.status];
+  return mapped ? { ...item, status: mapped } : item;
+}
+
 export function useContentItems() {
-  const [items, setItems] = useState(() => loadItems());
+  const [items, setItems] = useState(() => loadItems().map(migrateItem));
 
   useEffect(() => {
     saveItems(items);
